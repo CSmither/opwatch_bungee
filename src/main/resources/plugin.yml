@@ -1,0 +1,3 @@
+name: OpWatch
+main: org.smither.opwatch.spigot.Opwatch
+version: 1.0.2

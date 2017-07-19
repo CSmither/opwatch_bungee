@@ -1,0 +1,9 @@
+PurpleBotName: ""
+PurpleChannel: ""
+RegexCheckFile: ""
+MaxQueueSize: 50
+WipeMsg: 
+  - "This sign has"
+  - "been wiped by the"
+  - "MC Team!"
+  - ""

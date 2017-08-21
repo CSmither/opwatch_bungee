@@ -32,14 +32,16 @@ public class ChannelListener implements Listener{
             DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
             try {
                 String channel = in.readUTF(); // channel we delivered
-                String input = in.readUTF(); // the inputstring
+                String input;
                 if(channel.equals("SignChange")){
+                	input = in.readUTF(); // the inputstring
                     Object obj=fromString(input);
                     SignPlace sign=(SignPlace) obj ;
                     ProxyServer.getInstance().getLogger().info("SIGN PLACED: "+sign.getX()+" "+sign.getY()+" "+sign.getZ()+": "+sign.getContent()[0]+", "+sign.getContent()[1]+", "+sign.getContent()[2]+", "+sign.getContent()[3]);
                     plugin.addSign(sign);
                 }
                 else if (channel.equals("WipeSign")){
+                    input = in.readUTF(); // the inputstring
                 	boolean success=input.startsWith("Y");
                 	input=input.substring(1);
                     SignPlace sp=SignStore.getInstance().get(Integer.parseInt(input)) ;

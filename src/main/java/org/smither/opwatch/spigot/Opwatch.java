@@ -54,10 +54,8 @@ public final class Opwatch extends JavaPlugin implements Listener {
 	
 	@EventHandler
 	public void onSignChangeEvent(SignChangeEvent event){
-		String[] empty={"","","",""};
-		if (!event.getLines().equals(empty)){
+		if (!String.join("", event.getLines()).replace(" ", "").equals("")){
 			try {
-				getLogger().log(Level.FINE, "sign placed: "+event.getPlayer().getDisplayName());
 				pcl.sendToBungeeCord(event.getPlayer(), "SignChange", toString(new SignPlace(event)) );
 			} catch (IOException e) {
 				e.printStackTrace();

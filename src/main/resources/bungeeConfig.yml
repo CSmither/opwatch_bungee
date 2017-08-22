@@ -7,3 +7,8 @@ WipeMsg:
   - "been wiped by the"
   - "MC Team!"
   - ""
+databaseHost: "localhost"
+databasePort: 1433
+databaseName: "OpWatch"
+databaseUser: "opwatch"
+databasePass: "pass.opwatch"

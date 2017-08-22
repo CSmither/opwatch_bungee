@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.PluginDescription;
 
 public class OpWatchCommand extends Command{
 	String[] wipeMsg;
@@ -23,23 +25,40 @@ public class OpWatchCommand extends Command{
 		switch (args[0].toLowerCase()){
 		case "viewsigns":
 			if (args.length == 2){
-	    		Opwatch.instance.getLogger().info("Listing signs to "+sender.getName());
-	    		Opwatch.instance.getSignManager().listSigns(sender, Integer.parseInt(args[1]));
+				Opwatch.instance.getSignManager().listSigns(sender, Integer.parseInt(args[1]));
+			} else {
+				Opwatch.instance.getSignManager().listSigns(sender);
 			}
-    		Opwatch.instance.getLogger().info("Listing signs to "+sender.getName());
-    		Opwatch.instance.getSignManager().listSigns(sender);
 			break;
 		case "wipesign":
 			Opwatch.instance.getLogger().info("Wiping sign ID: "+args[1]);
 			Opwatch.instance.wipeSign(Integer.parseInt(args[1]), wipeMsg);
 			break;
 		case "viewsign":
-    		Opwatch.instance.getLogger().info("Viewing sign "+args[1]+" by "+sender.getName());
-    		SignPlace sp=Opwatch.instance.getSignManager().viewSign(sender, Integer.parseInt(args[1]));
-    		sender.sendMessage(
-    				String.format("%d: \"%s, %s, %s, %s\" at %s %s %d,%d,%d placed by %s%s",
-					sp.getID(),sp.getContent()[0],sp.getContent()[1],sp.getContent()[2],sp.getContent()[3],
-					sp.getServer(), sp.getWorld(), sp.getX(), sp.getY(), sp.getZ(), sp.getPlayer(), sp.isWiped()?", Has been Wiped":sp.attemptwipe()?", Wipe was attempted":""));
+			SignPlace sp=Opwatch.instance.getSignManager().viewSign(sender, Integer.parseInt(args[1]));
+			sender.sendMessage(new ComponentBuilder(
+					String.format("%d: \"%s, %s, %s, %s\" at %s %s %d,%d,%d placed by %s%s",
+							sp.getID(),sp.getContent()[0],sp.getContent()[1],sp.getContent()[2],sp.getContent()[3],
+							sp.getServer(), sp.getWorld(), sp.getX(), sp.getY(), sp.getZ(), sp.getPlayer(), sp.isWiped()?", Has been Wiped":sp.attemptwipe()?", Wipe was attempted":"")
+					).create());
+			break;
+		case "about":
+			PluginDescription desc = Opwatch.instance.getDescription();
+			sender.sendMessage(new ComponentBuilder(
+				String.format("%s\nVersion: %s\nAuthor: %s",
+						desc.getName(),desc.getVersion(),desc.getAuthor())
+				).create());
+			break;
+		case "help":
+			sender.sendMessage(new ComponentBuilder(
+					"/ow <command> [args]"
+					+ "\n  Commands:"
+					+ "\n    viewsigns [X]: shows all unreviewed signs, can also add integer argument \"X\" to show last X signs"
+					+ "\n    viewsign <X>: shows sign with id X"
+					+ "\n    wipesign <X>: wipes the sign with id X"
+					+ "\n    about: shows information about this plugin"
+					+ "\n    help: shows this message"
+					).create());
 			break;
 		}
 	}

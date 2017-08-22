@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
@@ -42,11 +43,7 @@ class SignQueue implements Serializable{
 		         instance = (SignQueue) in.readObject();
 		         in.close();
 		         fileIn.close();
-		      }catch(IOException i) {
-		         i.printStackTrace();
-		         instance=new SignQueue();
-		      }catch(ClassNotFoundException c) {
-		         c.printStackTrace();
+		      }catch(ClassNotFoundException|IOException e) {
 		         instance=new SignQueue();
 		      }
 			// Fill in rxs 
@@ -80,33 +77,43 @@ class SignQueue implements Serializable{
 		maxSize=Opwatch.instance.config.getInt("MaxQueueSize");
 		queue=new LinkedList<SignPlace>();
 	}
-	public void add(SignPlace sp) {  
+	public void add(final SignPlace sp) {  
 		queue.addLast(sp);
-		String content=String.join(" ", sp.getContent()).toLowerCase();
-		Opwatch.instance.getLogger().info("SIGN: "+String.join("", sp.getContent()));
-		for (Pattern rx : rxs){
-			if (rx.matcher(content).find()){
-				Opwatch.instance.getLogger().info("true");
-				Opwatch.instance.sendIRC(String.format("OPWATCH TRIGGERED!! %d: \"%s, %s, %s, %s\" at %s %s %d,%d,%d placed by %s",
-					sp.getID(),sp.getContent()[0],sp.getContent()[1],sp.getContent()[2],sp.getContent()[3],
-					sp.getServer(), sp.getWorld(), sp.getX(), sp.getY(), sp.getZ(), sp.getPlayer()));
-				Opwatch.instance.getLogger().info("SIGN TRIGGERED OPWATCH");
-				break;
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				String content=String.join(" ", sp.getContent()).toLowerCase();
+				for (Pattern rx : rxs){
+					if (rx.matcher(content).find()){
+						Opwatch.instance.sendIRC(String.format("OPWATCH TRIGGERED!! %d: \"%s, %s, %s, %s\" at %s %s %d,%d,%d placed by %s",
+							sp.getID(),sp.getContent()[0],sp.getContent()[1],sp.getContent()[2],sp.getContent()[3],
+							sp.getServer(), sp.getWorld(), sp.getX(), sp.getY(), sp.getZ(), sp.getPlayer()));
+						Opwatch.instance.getLogger().info("! ! ! SIGN TRIGGERED OPWATCH ! ! !");
+						break;
+					}
+				}
 			}
-		}
+		};
+		r.run();
 		if (queue.size()>maxSize){
 			Opwatch.instance.sendIRC("Sign queue size is at "+queue.size()+". Please review all signs with the command viewSigns");
 		}
 	}
-	public void listSigns(CommandSender sender) {
-		while(!queue.isEmpty()){
-			SignPlace sp=queue.removeFirst();
-			sender.sendMessage(new ComponentBuilder(
-						String.format("%d: \"%s, %s, %s, %s\" at %s %s %d,%d,%d placed by %s%s",
-						sp.getID(),sp.getContent()[0],sp.getContent()[1],sp.getContent()[2],sp.getContent()[3],
-						sp.getServer(), sp.getWorld(), sp.getX(), sp.getY(), sp.getZ(), sp.getPlayer(), sp.isWiped()?", Has been Wiped":sp.attemptwipe()?", Wipe was attempted":"")
-					).create());
-		}
+	public void listSigns(final CommandSender sender) {
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				while(!queue.isEmpty()){
+					SignPlace sp=queue.removeFirst();
+					sender.sendMessage(new ComponentBuilder(
+								String.format("%d: \"%s, %s, %s, %s\" at %s %s %d,%d,%d placed by %s%s",
+								sp.getID(),sp.getContent()[0],sp.getContent()[1],sp.getContent()[2],sp.getContent()[3],
+								sp.getServer(), sp.getWorld(), sp.getX(), sp.getY(), sp.getZ(), sp.getPlayer(), sp.isWiped()?", Has been Wiped":sp.attemptwipe()?", Wipe was attempted":"")
+							).create());
+				}
+				sender.sendMessage(new ComponentBuilder("Signs all checked").create());
+			}
+		};
+		r.run();
 	}
-
 }

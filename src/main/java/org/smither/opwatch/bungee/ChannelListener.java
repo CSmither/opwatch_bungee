@@ -37,7 +37,6 @@ public class ChannelListener implements Listener{
                 	input = in.readUTF(); // the inputstring
                     Object obj=fromString(input);
                     SignPlace sign=(SignPlace) obj ;
-                    ProxyServer.getInstance().getLogger().info("SIGN PLACED: "+sign.getX()+" "+sign.getY()+" "+sign.getZ()+": "+sign.getContent()[0]+", "+sign.getContent()[1]+", "+sign.getContent()[2]+", "+sign.getContent()[3]);
                     plugin.addSign(sign);
                 }
                 else if (channel.equals("WipeSign")){

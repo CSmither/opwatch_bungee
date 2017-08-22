@@ -52,6 +52,7 @@ public class Opwatch extends Plugin {
         this.getProxy().getPluginManager().registerListener(this, cl);
         this.getProxy().registerChannel("BungeeCord");
         getProxy().getPluginManager().registerCommand(this, new OpWatchCommand("OpWatch"));
+        getProxy().getPluginManager().registerCommand(this, new OpWatchCommand("ow"));
         getLogger().info("OPWATCH ready to go!");
     }
 
@@ -92,6 +93,7 @@ public class Opwatch extends Plugin {
         this.getProxy().getPluginManager().registerListener(this, cl);
         this.getProxy().registerChannel("BungeeCord");
         getProxy().getPluginManager().registerCommand(this, new OpWatchCommand("OpWatch"));
+        getProxy().getPluginManager().registerCommand(this, new OpWatchCommand("ow"));
         getLogger().info("OPWATCH ready to go!");
     }
 

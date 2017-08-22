@@ -12,6 +12,7 @@ public class SignPlace implements Serializable, Cloneable{
 		return clone;
 	}
 	private static final long serialVersionUID = 1L;
+	private int id;
 	private String[] content;
 	private String server;
 	private String world;
@@ -19,7 +20,6 @@ public class SignPlace implements Serializable, Cloneable{
 	private int y;
 	private int z;
 	private String player;
-	private int id;
 	private boolean wiped=false;
 	private boolean attemptWipe=false;
 	public SignPlace(SignChangeEvent sign) {
@@ -30,6 +30,18 @@ public class SignPlace implements Serializable, Cloneable{
 		y=sign.getBlock().getY();
 		z=sign.getBlock().getZ();
 		this.player=sign.getPlayer().getDisplayName();
+	}
+	SignPlace(int id, String[] content, String server, String world, int x, int y, int z, String player, boolean wiped, boolean attemptWipe) {
+		this.id=id;
+		this.content=content;
+		this.server=server;
+		this.world=world;
+		this.x=x;
+		this.y=y;
+		this.z=z;
+		this.player=player;
+		this.wiped=wiped;
+		this.attemptWipe=attemptWipe;
 	}
 	public String[] getContent() {
 		return content;

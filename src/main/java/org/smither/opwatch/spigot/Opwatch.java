@@ -9,6 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Base64;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -56,6 +57,7 @@ public final class Opwatch extends JavaPlugin implements Listener {
 		String[] empty={"","","",""};
 		if (!event.getLines().equals(empty)){
 			try {
+				getLogger().log(Level.FINE, "sign placed: "+event.getPlayer().getDisplayName());
 				pcl.sendToBungeeCord(event.getPlayer(), "SignChange", toString(new SignPlace(event)) );
 			} catch (IOException e) {
 				e.printStackTrace();

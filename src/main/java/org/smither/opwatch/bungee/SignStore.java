@@ -1,11 +1,5 @@
 package org.smither.opwatch.bungee;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -26,24 +20,8 @@ public class SignStore{
 	private Statement statement;
 	static SignStore getInstance(){
 		if (instance==null){
-			try {
-				File file = new File(Opwatch.instance.getDataFolder(), "SignStore.data");
-				if (!file.exists()) {
-					try {
-						file.createNewFile();
-					} catch (IOException e) {
-						throw new RuntimeException("Unable to create SignStore file", e);
-					}
-				}
-				FileInputStream fileIn = new FileInputStream(file);
-				ObjectInputStream in = new ObjectInputStream(fileIn);
-				instance = new SignStore();
-				instance.maxID=(int) in.readObject();
-				in.close();
-				fileIn.close();
-			}catch(ClassNotFoundException|IOException e) {
-				instance=new SignStore();
-			}
+			instance = new SignStore();
+			ResultSet result;
 			instance.host = Opwatch.instance.config.getString("databaseHost");
 			instance.port = Opwatch.instance.config.getInt("databasePort");
 			instance.database = Opwatch.instance.config.getString("databaseName");
@@ -53,7 +31,6 @@ public class SignStore{
 				instance.openConnection();
 				instance.statement = instance.connection.createStatement();
 				Opwatch.instance.getLogger().log(Level.SEVERE, "Connection is valid? "+instance.connection.isValid(1));
-				ResultSet result;
 				boolean schemaOK = false;
 				schemaOK=true;
 				Opwatch.instance.getLogger().log(Level.SEVERE, "schema exists");
@@ -82,6 +59,14 @@ public class SignStore{
 				e.printStackTrace();
 			} catch (SQLException e) {
 				e.printStackTrace();
+			}
+			instance.maxID=0;
+			try {
+				result = instance.statement.executeQuery("SELECT MAX(id) FROM `signs`");
+				result.next();
+				instance.maxID=result.getInt(1);
+			} catch (SQLException e1) {
+				e1.printStackTrace();
 			}
 		}
 		return instance;
@@ -146,15 +131,6 @@ public class SignStore{
 		return null;
 	}
 	void save(){
-		try {
-			FileOutputStream fileOut = new FileOutputStream(new File(Opwatch.instance.getDataFolder(), "SignStore.data"));
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(maxID);
-			out.close();
-			fileOut.close();
-		}catch(IOException i) {
-			i.printStackTrace();
-		}
 	}
 	public void listSigns(final CommandSender sender, final int amount) {
 		Runnable r = new Runnable() {

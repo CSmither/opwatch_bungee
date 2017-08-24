@@ -16,7 +16,7 @@ public class SignStore{
 	private String host, database, username, password;
 	private int port;
 	private static SignStore instance;
-	private int maxID;
+	private int nextID;
 	private Statement statement;
 	static SignStore getInstance(){
 		if (instance==null){
@@ -60,11 +60,11 @@ public class SignStore{
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			instance.maxID=0;
+			instance.nextID=0;
 			try {
 				result = instance.statement.executeQuery("SELECT MAX(id) FROM `signs`");
 				result.next();
-				instance.maxID=result.getInt(1);
+				instance.nextID=result.getInt(1)+1;
 			} catch (SQLException e1) {
 				e1.printStackTrace();
 			}
@@ -72,7 +72,7 @@ public class SignStore{
 		return instance;
 	}
 	private SignStore() {
-		maxID=0;
+		nextID=0;
 	}
 	public void openConnection() throws SQLException, ClassNotFoundException {
 		if (connection != null && !connection.isClosed()) {
@@ -88,7 +88,7 @@ public class SignStore{
 		}
 	}
 	public void add(final SignPlace sp) {
-		sp.setID(maxID++);
+		sp.setID(nextID++);
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
@@ -108,7 +108,9 @@ public class SignStore{
 					stmt.setBoolean(12, sp.isWiped());
 					stmt.setBoolean(13, sp.attemptwipe());
 					stmt.executeUpdate();
+					stmt.closeOnCompletion();
 				} catch (SQLException e) {
+					Opwatch.instance.getLogger().severe(e.getMessage());
 					Opwatch.instance.getLogger().severe(e.getSQLState());
 				}
 			}
@@ -127,6 +129,13 @@ public class SignStore{
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				statement.closeOnCompletion();
+				statement = connection.createStatement();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}
@@ -136,7 +145,7 @@ public class SignStore{
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
-				for (int i=maxID-1 ; i>=maxID-amount ; i-- ){
+				for (int i=nextID-1 ; i>=nextID-amount ; i-- ){
 					SignPlace sp=get(i);
 					if (sp == null){
 						break;
@@ -150,5 +159,65 @@ public class SignStore{
 			}
 		};
 		r.run();
+	}
+	public void updateSign(final int id, final String column, final String newValue){
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					PreparedStatement stmt = connection.prepareStatement("UPDATE `signs` SET ? = ? WHERE `id` = ?");
+					stmt.setString(1, column);
+					stmt.setString(2, newValue);
+					stmt.setInt(3, id);
+					stmt.executeUpdate();
+					stmt.closeOnCompletion();
+				} catch (SQLException e) {
+					Opwatch.instance.getLogger().severe(e.getMessage());
+					Opwatch.instance.getLogger().severe(e.getSQLState());
+				}
+			}
+		};
+		r.run();
+		return;
+	}
+	public void updateSign(final int id, final String column, final int newValue){
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					PreparedStatement stmt = connection.prepareStatement("UPDATE `signs` SET ? = ? WHERE `id` = ?");
+					stmt.setString(1, column);
+					stmt.setInt(2, newValue);
+					stmt.setInt(3, id);
+					stmt.executeUpdate();
+					stmt.closeOnCompletion();
+				} catch (SQLException e) {
+					Opwatch.instance.getLogger().severe(e.getMessage());
+					Opwatch.instance.getLogger().severe(e.getSQLState());
+				}
+			}
+		};
+		r.run();
+		return;
+	}
+	public void updateSign(final int id, final String column, final boolean newValue){
+		Runnable r = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					PreparedStatement stmt = connection.prepareStatement("UPDATE `signs` SET ? = ? WHERE `id` = ?");
+					stmt.setString(1, column);
+					stmt.setBoolean(2, newValue);
+					stmt.setInt(3, id);
+					stmt.executeUpdate();
+					stmt.closeOnCompletion();
+				} catch (SQLException e) {
+					Opwatch.instance.getLogger().severe(e.getMessage());
+					Opwatch.instance.getLogger().severe(e.getSQLState());
+				}
+			}
+		};
+		r.run();
+		return;
 	}
 }

@@ -20,8 +20,9 @@ public class SignManager {
     	signQueue.add(sign);
 	}
 
-	public SignPlace wipeSign(int id, String[] message) { // DO NOT USE IF YOU WANT TO KEEP ORIGINAL SIGN WRITING
+	public SignPlace wipeSign(int id, String[] message) {
     	SignPlace sign=signStore.get(id);
+    	signStore.updateSign(id, "attemptWipe", true);
 		try {
 			sign = sign.clone();
 		} catch (CloneNotSupportedException e) {

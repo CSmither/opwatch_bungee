@@ -48,6 +48,7 @@ public class ChannelListener implements Listener{
         					sp.getID(),sp.getContent()[0],sp.getContent()[1],sp.getContent()[2],sp.getContent()[3],
         					sp.getServer(), sp.getWorld(), sp.getX(), sp.getY(), sp.getZ(), sp.getPlayer(), sp.isWiped()?", Has been Wiped":"", success?"":", probably the sign has been destroyed"));
                     sp.attemptwipe(true);
+                    SignStore.getInstance().updateSign(sp.getID(), "wiped", true);
                 	if (success){
                     	sp.wiped(true);
                     }

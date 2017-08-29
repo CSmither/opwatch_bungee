@@ -22,7 +22,7 @@ public class SignManager {
 
 	public SignPlace wipeSign(int id, String[] message) {
     	SignPlace sign=signStore.get(id);
-    	signStore.updateSign(id, "attemptWipe", true);
+    	signStore.setAttemptWipe(id, true);
 		try {
 			sign = sign.clone();
 		} catch (CloneNotSupportedException e) {

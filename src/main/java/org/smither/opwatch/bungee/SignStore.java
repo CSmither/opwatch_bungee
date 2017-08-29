@@ -176,7 +176,7 @@ public class SignStore{
 		};
 		r.run();
 	}
-	public void updateSign(final int id, final String column, final String newValue){
+	public void setAttemptWipe(final int id, final boolean newValue){
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
@@ -189,10 +189,9 @@ public class SignStore{
 							e.printStackTrace();
 						}
 					}
-					PreparedStatement stmt = connection.prepareStatement("UPDATE `signs` SET ? = ? WHERE `id` = ?");
-					stmt.setString(1, column);
-					stmt.setString(2, newValue);
-					stmt.setInt(3, id);
+					PreparedStatement stmt = connection.prepareStatement("UPDATE `signs` SET `attemptWipe` = ? WHERE `id` = ?");
+					stmt.setBoolean(1, newValue);
+					stmt.setInt(2, id);
 					stmt.executeUpdate();
 					stmt.closeOnCompletion();
 				} catch (SQLException e) {
@@ -204,7 +203,7 @@ public class SignStore{
 		r.run();
 		return;
 	}
-	public void updateSign(final int id, final String column, final int newValue){
+	public void setWiped(final int id, final boolean newValue){
 		Runnable r = new Runnable() {
 			@Override
 			public void run() {
@@ -217,38 +216,9 @@ public class SignStore{
 							e.printStackTrace();
 						}
 					}
-					PreparedStatement stmt = connection.prepareStatement("UPDATE `signs` SET ? = ? WHERE `id` = ?");
-					stmt.setString(1, column);
-					stmt.setInt(2, newValue);
-					stmt.setInt(3, id);
-					stmt.executeUpdate();
-					stmt.closeOnCompletion();
-				} catch (SQLException e) {
-					Opwatch.instance.getLogger().severe(e.getMessage());
-					Opwatch.instance.getLogger().severe(e.getSQLState());
-				}
-			}
-		};
-		r.run();
-		return;
-	}
-	public void updateSign(final int id, final String column, final boolean newValue){
-		Runnable r = new Runnable() {
-			@Override
-			public void run() {
-				try {
-					if (!connection.isValid(0)){
-						try {
-							openConnection();
-						} catch (ClassNotFoundException e) {
-							System.err.println("Failed to reopen connection");
-							e.printStackTrace();
-						}
-					}
-					PreparedStatement stmt = connection.prepareStatement("UPDATE `signs` SET ? = ? WHERE `id` = ?");
-					stmt.setString(1, column);
-					stmt.setBoolean(2, newValue);
-					stmt.setInt(3, id);
+					PreparedStatement stmt = connection.prepareStatement("UPDATE `signs` SET `wiped` = ? WHERE `id` = ?");
+					stmt.setBoolean(1, newValue);
+					stmt.setInt(2, id);
 					stmt.executeUpdate();
 					stmt.closeOnCompletion();
 				} catch (SQLException e) {

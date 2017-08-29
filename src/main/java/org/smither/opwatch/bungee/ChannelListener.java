@@ -47,10 +47,9 @@ public class ChannelListener implements Listener{
                 	sendIRC(String.format("Sign%swiped %d: \"%s, %s, %s, %s\" at %s %s %d,%d,%d placed by %s%s%s", success?" ":" NOT ",
         					sp.getID(),sp.getContent()[0],sp.getContent()[1],sp.getContent()[2],sp.getContent()[3],
         					sp.getServer(), sp.getWorld(), sp.getX(), sp.getY(), sp.getZ(), sp.getPlayer(), sp.isWiped()?", Has been Wiped":"", success?"":", probably the sign has been destroyed"));
-                    sp.attemptwipe(true);
-                    SignStore.getInstance().updateSign(sp.getID(), "wiped", true);
+                    SignStore.getInstance().setAttemptWipe(sp.getID(), true);
                 	if (success){
-                    	sp.wiped(true);
+                        SignStore.getInstance().setWiped(sp.getID(), true);
                     }
                 }
             } catch (IOException e1) {
@@ -63,7 +62,6 @@ public class ChannelListener implements Listener{
     }
 
     public void sendToBukkit(String channel, String message, ServerInfo server) {
-        ProxyServer.getInstance().getLogger().info("MESSAGE SENDING: "+channel+"@"+message+server.getName());
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(stream);
         try {
@@ -72,7 +70,7 @@ public class ChannelListener implements Listener{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ProxyServer.getInstance().getLogger().info(server.sendData("BungeeCord", stream.toByteArray(),true)?"sent":"failed");
+        server.sendData("BungeeCord", stream.toByteArray(),true);
     }
 
     void sendIRC(String msg){

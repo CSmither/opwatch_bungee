@@ -93,6 +93,14 @@ public class SignStore{
 			@Override
 			public void run() {
 				try {
+					if (!connection.isValid(0)){
+						try {
+							openConnection();
+						} catch (ClassNotFoundException e) {
+							System.err.println("Failed to reopen connection");
+							e.printStackTrace();
+						}
+					}
 					PreparedStatement stmt = connection.prepareStatement("INSERT INTO signs (id, line0, line1, line2, line3, server, world, x, y, z, player, wiped, attemptWipe) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 					stmt.setInt(1, sp.getID());
 					stmt.setString(2, sp.getContent()[0]);
@@ -121,6 +129,14 @@ public class SignStore{
 	public SignPlace get(int id) {
 		ResultSet result;
 		try {
+			if (!connection.isValid(0)){
+				try {
+					openConnection();
+				} catch (ClassNotFoundException e) {
+					System.err.println("Failed to reopen connection");
+					e.printStackTrace();
+				}
+			}
 			result = statement.executeQuery("SELECT * FROM signs WHERE id = "+id+";");
 			while (result.next()) {
 				String[] content={result.getString("line0"),result.getString("line1"),result.getString("line2"),result.getString("line3")};
@@ -165,6 +181,14 @@ public class SignStore{
 			@Override
 			public void run() {
 				try {
+					if (!connection.isValid(0)){
+						try {
+							openConnection();
+						} catch (ClassNotFoundException e) {
+							System.err.println("Failed to reopen connection");
+							e.printStackTrace();
+						}
+					}
 					PreparedStatement stmt = connection.prepareStatement("UPDATE `signs` SET ? = ? WHERE `id` = ?");
 					stmt.setString(1, column);
 					stmt.setString(2, newValue);
@@ -185,6 +209,14 @@ public class SignStore{
 			@Override
 			public void run() {
 				try {
+					if (!connection.isValid(0)){
+						try {
+							openConnection();
+						} catch (ClassNotFoundException e) {
+							System.err.println("Failed to reopen connection");
+							e.printStackTrace();
+						}
+					}
 					PreparedStatement stmt = connection.prepareStatement("UPDATE `signs` SET ? = ? WHERE `id` = ?");
 					stmt.setString(1, column);
 					stmt.setInt(2, newValue);
@@ -205,6 +237,14 @@ public class SignStore{
 			@Override
 			public void run() {
 				try {
+					if (!connection.isValid(0)){
+						try {
+							openConnection();
+						} catch (ClassNotFoundException e) {
+							System.err.println("Failed to reopen connection");
+							e.printStackTrace();
+						}
+					}
 					PreparedStatement stmt = connection.prepareStatement("UPDATE `signs` SET ? = ? WHERE `id` = ?");
 					stmt.setString(1, column);
 					stmt.setBoolean(2, newValue);

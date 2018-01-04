@@ -12,9 +12,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
@@ -51,8 +51,12 @@ class SignQueue implements Serializable{
 				Configuration regexFile = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new File(Opwatch.instance.config.getString("RegexCheckPath")));
 				List<Map<String,String>> rules=(List<Map<String, String>>) regexFile.getList("rules");
 				for (Map<String,String> rule : rules){
-					rxs.add(Pattern.compile(rule.get("pattern")));
-					Opwatch.instance.getLogger().info(Integer.toString(rxs.size())+" patterns loaded");
+					try {
+						rxs.add(Pattern.compile(rule.get("pattern")));
+						if (Opwatch.instance.debug) {Opwatch.instance.getLogger().info(Integer.toString(rxs.size())+" patterns loaded");}
+					}catch(PatternSyntaxException ex) {
+						Opwatch.instance.sendIRC("OPWATCH ERROR! Regex Pattern load failed on regex \""+ex.getPattern()+"\"");
+					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();

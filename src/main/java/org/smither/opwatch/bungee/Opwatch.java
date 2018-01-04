@@ -23,6 +23,7 @@ public class Opwatch extends Plugin {
 	Configuration config;
 	public static Opwatch instance;
 	private SignManager signManager;
+	public boolean debug=true;
 	
     @Override
     public void onEnable(){
@@ -47,6 +48,7 @@ public class Opwatch extends Plugin {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    	debug=config.getBoolean("debug");
     	cl=new ChannelListener(this);
     	signManager=new SignManager();
         this.getProxy().getPluginManager().registerListener(this, cl);

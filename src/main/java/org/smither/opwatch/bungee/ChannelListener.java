@@ -70,7 +70,9 @@ public class ChannelListener implements Listener{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        server.sendData("BungeeCord", stream.toByteArray(),true);
+        if (!server.sendData("BungeeCord", stream.toByteArray(),true)) {
+        	sendIRC("OPWatch >> Message failed to send to spigot servers");
+        }
     }
 
     void sendIRC(String msg){

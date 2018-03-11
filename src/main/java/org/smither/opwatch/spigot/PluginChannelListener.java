@@ -10,7 +10,7 @@ import java.util.Base64;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.messaging.PluginMessageListener;
-import org.smither.opwatch.bungee.SignPlace;
+import org.smither.opwatch.bungee.SignChange;
 
 public class PluginChannelListener implements PluginMessageListener{
 	
@@ -21,7 +21,7 @@ public class PluginChannelListener implements PluginMessageListener{
             String subchannel = in.readUTF();
             if(subchannel.equals("WipeSign")){
                 Object obj = fromString(in.readUTF());
-            	SignPlace sign=(SignPlace)obj;
+            	SignChange sign=(SignChange)obj;
             	if (Opwatch.getPlugin(Opwatch.class).wipeSign(sign)){
             		sendToBungeeCord(player, "WipeSign", "Y"+Integer.toString(sign.getID()));
             	} else {

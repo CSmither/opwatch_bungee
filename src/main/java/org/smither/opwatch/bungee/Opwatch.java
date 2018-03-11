@@ -9,7 +9,9 @@ import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 import com.google.common.io.ByteStreams;
 
@@ -22,7 +24,8 @@ public class Opwatch extends Plugin {
 	private ChannelListener cl;
 	Configuration config;
 	public static Opwatch instance;
-	private SignManager signManager;
+	private Manager manager;
+	String[] wipeMsg;
 	public boolean debug=true;
 	
     @Override
@@ -48,9 +51,14 @@ public class Opwatch extends Plugin {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		List<String> wipeMsg=new ArrayList<String>();
+		for (Object line : Opwatch.instance.config.getList("WipeMsg")){
+			wipeMsg.add((String)line);
+		}
+		this.wipeMsg=wipeMsg.toArray(new String[4]);
     	debug=config.getBoolean("debug");
     	cl=new ChannelListener(this);
-    	signManager=new SignManager();
+    	manager=new Manager();
         this.getProxy().getPluginManager().registerListener(this, cl);
         this.getProxy().registerChannel("BungeeCord");
         getProxy().getPluginManager().registerCommand(this, new OpWatchCommand("OpWatch"));
@@ -61,7 +69,7 @@ public class Opwatch extends Plugin {
     @Override
     public void onDisable(){
     	try {
-			signManager.shutdown();
+			manager.shutdown();
 			ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, new File(getDataFolder(), "config.yml"));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -91,7 +99,7 @@ public class Opwatch extends Plugin {
 			e.printStackTrace();
 		}
     	cl=new ChannelListener(this);
-    	signManager=new SignManager();
+    	manager=new Manager();
         this.getProxy().getPluginManager().registerListener(this, cl);
         this.getProxy().registerChannel("BungeeCord");
         getProxy().getPluginManager().registerCommand(this, new OpWatchCommand("OpWatch"));
@@ -99,14 +107,18 @@ public class Opwatch extends Plugin {
         getLogger().info("OPWATCH ready to go!");
     }
 
-    public void addSign(SignPlace sign){
-    	signManager.addSign(sign);
+    public void add(SignChange sign){
+    	manager.addSign(sign);
+    }
+
+    public void add(BookChange book){
+    	manager.addBook(book);
     }
 
     void wipeSign(int id, String[] message){
-    	SignPlace sign;
+    	SignChange sign;
 		try {
-			sign = signManager.wipeSign(id, message);
+			sign = manager.wipeSign(id, message);
 			cl.sendToBukkit("WipeSign", toString(sign), getProxy().getServerInfo(sign.getServer()));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -126,7 +138,7 @@ public class Opwatch extends Plugin {
 		cl.sendIRC(msg);
 	}
 
-	public SignManager getSignManager() {
-		return signManager;
+	public Manager getSignManager() {
+		return manager;
 	}
 }

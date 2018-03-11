@@ -28,28 +28,48 @@ public class ChannelListener implements Listener{
 	
     @EventHandler
     public void onPluginMessage(PluginMessageEvent e) {
+    	ServerInfo sender=null;
         if (e.getTag().equalsIgnoreCase("BungeeCord")) {
             DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
+            for (ServerInfo server : ProxyServer.getInstance().getServers().values()) {
+            	if (server.getAddress()==e.getSender().getAddress()) {
+            		sender=server;
+            		break;
+            	}
+            }
+            if (sender==null) {
+            	sendIRC("Message revieved matched no known server");
+            	ProxyServer.getInstance().getLogger().severe("Message revieved matched no known server");
+            }
             try {
                 String channel = in.readUTF(); // channel we delivered
                 String input;
                 if(channel.equals("SignChange")){
                 	input = in.readUTF(); // the inputstring
                     Object obj=fromString(input);
-                    SignPlace sign=(SignPlace) obj ;
-                    plugin.addSign(sign);
+                    SignChange sign=(SignChange) obj ;
+                    ProxyServer.getInstance().getLogger().info(sign.getWorld()+", "+sign.getX());
+                    sign.setServer(sender.getName());
+                    plugin.add(sign);
+                }
+                else if(channel.equals("BookChange")){
+                	input = in.readUTF(); // the inputstring
+                    Object obj=fromString(input);
+                    BookChange book=(BookChange) obj ;
+                    book.setServer(sender.getName());
+                    plugin.add(book);
                 }
                 else if (channel.equals("WipeSign")){
                     input = in.readUTF(); // the inputstring
                 	boolean success=input.startsWith("Y");
                 	input=input.substring(1);
-                    SignPlace sp=SignStore.getInstance().get(Integer.parseInt(input)) ;
+                    SignChange sp=Store.getInstance().get(Integer.parseInt(input)) ;
                 	sendIRC(String.format("Sign%swiped %d: \"%s, %s, %s, %s\" at %s %s %d,%d,%d placed by %s%s%s", success?" ":" NOT ",
         					sp.getID(),sp.getContent()[0],sp.getContent()[1],sp.getContent()[2],sp.getContent()[3],
         					sp.getServer(), sp.getWorld(), sp.getX(), sp.getY(), sp.getZ(), sp.getPlayer(), sp.isWiped()?", Has been Wiped":"", success?"":", probably the sign has been destroyed"));
-                    SignStore.getInstance().setAttemptWipe(sp.getID(), true);
+                    Store.getInstance().setAttemptWipe(sp.getID(), true);
                 	if (success){
-                        SignStore.getInstance().setWiped(sp.getID(), true);
+                        Store.getInstance().setWiped(sp.getID(), true);
                     }
                 }
             } catch (IOException e1) {
@@ -69,6 +89,10 @@ public class ChannelListener implements Listener{
             out.writeUTF(message);
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        if (server.hashCode()!=0) {
+        }
+        if (stream.size()!=0) {
         }
         if (!server.sendData("BungeeCord", stream.toByteArray(),true)) {
         	sendIRC("OPWatch >> Message failed to send to spigot servers");

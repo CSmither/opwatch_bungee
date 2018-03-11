@@ -1,23 +1,14 @@
 package org.smither.opwatch.bungee;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.PluginDescription;
 
 public class OpWatchCommand extends Command{
-	String[] wipeMsg;
 
-	public OpWatchCommand(String string) {
-		super(string);
-		List<String> wipeMsg=new ArrayList<String>();
-		for (Object line : Opwatch.instance.config.getList("WipeMsg")){
-			wipeMsg.add((String)line);
-		}
-		this.wipeMsg=wipeMsg.toArray(new String[4]);
+	public OpWatchCommand(String name) {
+		super(name);
 	}
 
 	@Override
@@ -32,10 +23,10 @@ public class OpWatchCommand extends Command{
 			break;
 		case "wipesign":
 			Opwatch.instance.getLogger().info("Wiping sign ID: "+args[1]);
-			Opwatch.instance.wipeSign(Integer.parseInt(args[1]), wipeMsg);
+			Opwatch.instance.wipeSign(Integer.parseInt(args[1]), Opwatch.instance.wipeMsg);
 			break;
 		case "viewsign":
-			SignPlace sp=Opwatch.instance.getSignManager().viewSign(sender, Integer.parseInt(args[1]));
+			SignChange sp=Opwatch.instance.getSignManager().viewSign(sender, Integer.parseInt(args[1]));
 			sender.sendMessage(new ComponentBuilder(
 					String.format("%d: \"%s, %s, %s, %s\" at %s %s %d,%d,%d placed by %s%s",
 							sp.getID(),sp.getContent()[0],sp.getContent()[1],sp.getContent()[2],sp.getContent()[3],
